@@ -9,23 +9,41 @@
 # the selected option will be set by nana into std::filesystem
 # By default Nana will try to use the STD. If STD is not available and NANA_CMAKE_FIND_BOOST_FILESYSTEM
 # is set to ON nana will try to use boost if available. Nana own implementation will be use if none of
-# the previus were selected or available.
+# the previous were selected or available.
 # You can change that default if you change one of the following
 # (please don't define more than one of the _XX_FORCE options):
 option(NANA_CMAKE_NANA_FILESYSTEM_FORCE "Force nana filesystem over ISO and boost?" OFF)
-option(NANA_CMAKE_STD_FILESYSTEM_FORCE "Use of STD filesystem?(a compilation error will ocurre if not available)" OFF)
+option(NANA_CMAKE_STD_FILESYSTEM_FORCE "Use of STD filesystem?(a compilation error will occur if not available)" OFF)
 option(NANA_CMAKE_BOOST_FILESYSTEM_FORCE "Force use of Boost filesystem if available (over STD)?" OFF)
 option(NANA_CMAKE_FIND_BOOST_FILESYSTEM "Search: Is Boost filesystem available?" OFF)
 
 if(NANA_CMAKE_NANA_FILESYSTEM_FORCE)
     target_compile_definitions(nana PUBLIC NANA_FILESYSTEM_FORCE)
+    set(NANA_CMAKE_NANA_FILESYSTEM ON)
 
 elseif(NANA_CMAKE_STD_FILESYSTEM_FORCE)
     target_compile_definitions(nana PUBLIC STD_FILESYSTEM_FORCE)
-    target_link_libraries     (nana PUBLIC stdc++fs)
+    set(NANA_CMAKE_STD_FILESYSTEM ON)
 
 elseif(NANA_CMAKE_BOOST_FILESYSTEM_FORCE)
     target_compile_definitions(nana PUBLIC BOOST_FILESYSTEM_FORCE)
+    set(NANA_CMAKE_BOOST_FILESYSTEM ON)
+
+else()
+    # todo   test for std    (for now just force nana or boost if there no std)
+    set(NANA_CMAKE_STD_FILESYSTEM ON)
+
+    # todo if not test for boost
+    # if not add nana filesystem
+endif()
+
+if(NANA_CMAKE_NANA_FILESYSTEM)
+    # Nothing.
+elseif(NANA_CMAKE_STD_FILESYSTEM)
+    if(NOT MSVC)
+        target_link_libraries     (nana PUBLIC stdc++fs)
+    endif()
+elseif(NANA_CMAKE_BOOST_FILESYSTEM)
     # https://cmake.org/cmake/help/git-master/module/FindBoost.html
     # Implicit dependencies such as Boost::filesystem requiring Boost::system will be automatically detected and satisfied,
     # even if system is not specified when using find_package and if Boost::system is not added to target_link_libraries.
@@ -41,16 +59,4 @@ elseif(NANA_CMAKE_BOOST_FILESYSTEM_FORCE)
     endif()
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
-
-else()
-    # todo   test for std    (for now just force nana or boost if there no std)
-    target_link_libraries     (nana PUBLIC stdc++fs)
-
-    # todo if not test for boost
-    # if not add nana filesystem
 endif()
-
-
-
-
-
