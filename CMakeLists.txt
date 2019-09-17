@@ -110,6 +110,8 @@ foreach(subdir ${NANA_INCLUDE_SUBDIRS})
     aux_source_directory(${NANA_INCLUDE_DIR}/nana${subdir} HEADERS)  # todo: use GLOB to add headers too !!!!!!!
 endforeach()
 
+target_include_directories(nana PUBLIC ${NANA_INCLUDE_DIR})
+
 ###  Some nana compilation options   ###
 option(NANA_CMAKE_AUTOMATIC_GUI_TESTING "Activate automatic GUI testing?" OFF)
 option(NANA_CMAKE_ENABLE_MINGW_STD_THREADS_WITH_MEGANZ "replaced boost.thread with meganz's mingw-std-threads." OFF) # deprecate?
